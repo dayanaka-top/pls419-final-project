@@ -1,0 +1,519 @@
+<!doctype html>
+<html lang="en"><script>document.documentElement.className="js"</script>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>An Office AI Is Rewriting</title>
+<meta name="description" content="PLS 419 final project: older clerical workers in Kazakhstan and AI.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#f3eee3; --paper-2:#ebe4d5; --card:#fbf8f1; --ink:#1e2430; --ink-soft:#4a5262;
+  --line:#d6cdb9; --blue:#27467a; --blue-soft:#dfe6f2; --red:#b3372b; --red-soft:#f5dcd6;
+  --amber:#a86b12; --amber-soft:#f6e6c6; --green:#3f6e45; --green-soft:#dcead8;
+  --grey:#6b6f78; --grey-soft:#e6e3dc; --marker:#f6dc6e;
+  --serif:"Source Serif 4", Georgia, serif; --display:"Fraunces", Georgia, serif;
+  --mono:"IBM Plex Mono", ui-monospace, Menlo, monospace;
+  --w:720px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:84px}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--serif);font-size:19px;line-height:1.65;
+  background-image:linear-gradient(var(--paper-2) 1px,transparent 1px);background-size:100% 34px;background-attachment:fixed}
+a{color:var(--blue)}
+strong{font-weight:600}
+
+/* ---------- top bar ---------- */
+.topbar{position:sticky;top:0;z-index:50;background:rgba(243,238,227,.94);backdrop-filter:blur(6px);border-bottom:1px solid var(--line)}
+.topbar-in{max-width:1180px;margin:0 auto;display:flex;align-items:center;gap:20px;padding:10px 20px}
+.brand{font-family:var(--mono);font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;text-decoration:none;color:var(--ink);white-space:nowrap}
+.route{display:flex;gap:4px;margin-left:auto;list-style:none;padding:0;margin-top:0;margin-bottom:0;overflow-x:auto;scrollbar-width:none}
+.route::-webkit-scrollbar{display:none}
+.route a{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:12.5px;text-decoration:none;color:var(--ink-soft);padding:6px 10px;border-radius:999px;white-space:nowrap;transition:background .2s,color .2s}
+.route a span{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;border:1px solid currentColor;font-size:10.5px}
+.route a:hover{background:var(--paper-2);color:var(--ink)}
+.route a.active{background:var(--ink);color:var(--paper)}
+.progress{height:3px;background:var(--blue);width:0;transition:width .1s linear}
+
+/* ---------- hero ---------- */
+.hero{max-width:1180px;margin:0 auto;padding:72px 20px 40px;display:grid;grid-template-columns:1.05fr 1fr;gap:56px;align-items:start}
+.kicker{font-family:var(--mono);font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--red);margin:0 0 18px}
+.hero h1{font-family:var(--display);font-weight:800;font-size:clamp(42px,6.2vw,80px);line-height:1.02;letter-spacing:-.02em;margin:0 0 26px}
+.hero h1 .strike{position:relative;color:var(--ink-soft)}
+.hero h1 .strike::after{content:"";position:absolute;left:-2%;right:-2%;top:54%;height:.09em;background:var(--red);transform:scaleX(0);transform-origin:left;animation:strike 1.1s .6s cubic-bezier(.6,.1,.2,1) forwards}
+.hero h1 .rewrite{display:block;color:var(--blue);font-style:italic;font-weight:600}
+@keyframes strike{to{transform:scaleX(1)}}
+.hero-lead{font-family:var(--mono);font-size:14px;color:var(--ink-soft);max-width:440px;margin:0 0 30px}
+.memo{background:var(--card);border:1px solid var(--line);box-shadow:0 1px 0 var(--line),0 18px 40px -24px rgba(30,36,48,.45);padding:34px 34px 26px;position:relative;transform:rotate(.6deg)}
+.memo::before{content:"";position:absolute;top:-14px;left:50%;width:110px;height:28px;margin-left:-55px;background:rgba(246,220,110,.65);transform:rotate(-2deg)}
+.memo p{margin:0 0 16px;font-size:17.5px}
+.memo-tag{font-family:var(--mono);font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);border-bottom:1px dashed var(--line);padding-bottom:10px;margin-bottom:18px}
+
+/* case-file index */
+.index{max-width:1180px;margin:0 auto;padding:10px 20px 40px}
+.index-label{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);margin:0 0 12px}
+.tabs{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;list-style:none;margin:0;padding:0;counter-reset:t}
+.tabs a{display:block;height:100%;text-decoration:none;color:var(--ink);background:var(--card);border:1px solid var(--line);border-top:5px solid var(--c,var(--blue));padding:14px 16px 16px;transition:transform .2s,box-shadow .2s}
+.tabs a:hover{transform:translateY(-4px);box-shadow:0 14px 28px -18px rgba(30,36,48,.5)}
+.tabs b{display:block;font-family:var(--mono);font-size:12px;color:var(--c,var(--blue));margin-bottom:4px}
+.tabs i{font-style:normal;font-family:var(--display);font-weight:600;font-size:19px;line-height:1.2}
+.arrow{font-family:var(--mono);color:var(--ink-soft)}
+
+/* ---------- sections ---------- */
+.chapter{position:relative;padding:40px 20px 70px}
+.chapter + .chapter{border-top:1px solid var(--line)}
+.folder-tab{max-width:var(--w);margin:0 auto 10px;font-family:var(--mono);font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--c)}
+.folder-tab::before{content:"";display:inline-block;width:28px;height:2px;background:currentColor;vertical-align:middle;margin-right:10px}
+.sec-title{max-width:var(--w);margin:0 auto 34px;font-family:var(--display);font-weight:800;font-size:clamp(32px,4.6vw,54px);line-height:1.08;letter-spacing:-.015em}
+.prose{max-width:var(--w);margin:0 auto}
+.prose p{margin:0 0 1.15em}
+.prose h3{font-family:var(--display);font-weight:600;font-size:27px;line-height:1.2;margin:1.9em 0 .6em}
+.prose h3::before{content:"§ ";color:var(--c);font-weight:400}
+.prose h4{font-family:var(--display);font-weight:600;font-size:23px;margin:1.6em 0 .5em}
+.wide{max-width:1000px;margin:34px auto}
+
+.callout{background:var(--card);border-left:5px solid var(--c);padding:22px 26px;margin:1.6em 0;font-size:20px;box-shadow:0 10px 30px -24px rgba(30,36,48,.6)}
+.callout p{margin:0}
+.marker{background:linear-gradient(transparent 55%,var(--marker) 55%,var(--marker) 92%,transparent 92%);background-size:0% 100%;background-repeat:no-repeat;transition:background-size 1.2s ease}
+.marker.on{background-size:100% 100%}
+
+/* visuals */
+.figure{background:var(--card);border:1px solid var(--line);padding:24px 24px 18px;box-shadow:0 18px 40px -30px rgba(30,36,48,.5)}
+.fig-cap{font-family:var(--mono);font-size:13px;font-weight:600;letter-spacing:.06em;margin:0 0 6px;color:var(--ink)}
+.fig-note{font-family:var(--mono);font-size:11.5px;color:var(--ink-soft);margin:10px 0 0}
+.visual-tag{display:inline-block;font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;background:var(--ink);color:var(--paper);padding:2px 7px;margin-bottom:12px}
+
+.dots{display:grid;grid-template-columns:repeat(20,1fr);gap:5px;max-width:520px;margin:12px 0 6px}
+.dots i{aspect-ratio:1;border-radius:50%;background:var(--ink);transition:background .5s,transform .5s}
+.dots.on i.cut{background:transparent;box-shadow:inset 0 0 0 1.5px var(--red);transform:scale(.8)}
+.legend{display:flex;gap:18px;flex-wrap:wrap;font-family:var(--mono);font-size:12px;color:var(--ink-soft);margin-top:8px}
+.legend span::before{content:"";display:inline-block;width:11px;height:11px;border-radius:50%;margin-right:6px;vertical-align:-1px;background:var(--k)}
+.legend .o::before{background:transparent;box-shadow:inset 0 0 0 1.5px var(--red)}
+
+.fig1-grid{display:grid;grid-template-columns:1.25fr 1fr;gap:28px;align-items:start}
+.chart-row{display:grid;grid-template-columns:52px 1fr 54px;align-items:center;gap:10px;margin:5px 0;font-family:var(--mono);font-size:12px}
+.chart-row .age{color:var(--ink-soft);text-align:right}
+.chart-row .bars{display:grid;gap:2px}
+.chart-row .bar{height:9px;width:0;transition:width 1s cubic-bezier(.3,.7,.2,1)}
+.chart-row .b09{background:#a9b3c4}
+.chart-row .b21{background:var(--blue)}
+.chart-row.older .b21{background:var(--red)}
+.chart-row.older .age{color:var(--red);font-weight:600}
+.chart-row .chg{text-align:right;font-weight:600}
+.chart-row.older .chg{color:var(--red)}
+.chart-row:hover .bars{outline:1px dashed var(--line);outline-offset:3px}
+.legend .k09::before{background:#a9b3c4;border-radius:2px}
+.legend .k21::before{background:var(--blue);border-radius:2px}
+.legend .k50::before{background:var(--red);border-radius:2px}
+
+.exp-row{display:grid;grid-template-columns:minmax(120px,180px) 1fr 42px;gap:12px;align-items:center;font-family:var(--mono);font-size:12.5px;margin:9px 0}
+.exp-track{height:14px;background:var(--grey-soft);position:relative}
+.exp-fill{position:absolute;inset:0 auto 0 0;width:0;background:var(--blue);transition:width 1s ease}
+.exp-row b{text-align:right}
+
+/* tables */
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-family:var(--serif);font-size:16px;line-height:1.5;background:var(--card)}
+th,td{padding:11px 14px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}
+thead th{font-family:var(--mono);font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;background:var(--ink);color:var(--paper);border-bottom:none}
+tbody th{font-weight:600}
+table.census{font-family:var(--mono);font-size:13.5px}
+table.census td,table.census thead th:not(:first-child){text-align:right}
+table.census tr.older{background:var(--red-soft)}
+table.census tr.older th{color:var(--red)}
+table.census tr.total{border-top:2px solid var(--ink)}
+table.census tr.total th,table.census tr.total td{font-weight:600}
+table.gaps th[scope=row]{width:28%}
+table.gaps td:nth-child(2){width:120px;white-space:nowrap}
+table.bill th[scope=row]{width:18%;font-family:var(--display);font-size:17px}
+table.bill td:last-child{width:130px}
+tbody tr{transition:background .2s}
+table.gaps tbody tr:hover,table.bill tbody tr:hover{background:var(--paper)}
+.badge{display:inline-block;font-family:var(--mono);font-size:11.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border:1.5px solid currentColor;line-height:1.3}
+.b-ok,.b-low{color:var(--green);background:var(--green-soft)}
+.b-silent,.b-high{color:var(--red);background:var(--red-soft);transform:rotate(-3deg)}
+.b-borrowed,.b-mid{color:var(--amber);background:var(--amber-soft)}
+.b-inputs,.b-unknown{color:var(--grey);background:var(--grey-soft);border-style:dashed}
+
+/* steps */
+.steps{list-style:none;padding:0;margin:20px 0 30px;display:grid;grid-template-columns:repeat(4,1fr);gap:14px;counter-reset:s;max-width:1000px}
+.steps li{counter-increment:s;background:var(--card);border:1px solid var(--line);padding:18px 18px 20px;font-size:16.5px;line-height:1.55;position:relative}
+.steps li::before{content:counter(s);display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:var(--c);color:#fff;font-family:var(--mono);font-weight:600;margin-bottom:12px}
+.steps li:not(:last-child)::after{content:"→";position:absolute;right:-13px;top:22px;font-family:var(--mono);color:var(--ink-soft);background:var(--paper);z-index:1}
+.steps strong{display:block;font-family:var(--display);font-size:19px;margin-bottom:4px}
+.steps-wrap{max-width:1000px;margin:0 auto}
+
+.cases{display:grid;gap:0}
+.todo{list-style:none;padding:0;margin:14px 0 28px}
+.todo li{position:relative;padding:14px 0 14px 46px;border-bottom:1px dashed var(--line)}
+.todo li::before{content:"";position:absolute;left:4px;top:18px;width:22px;height:22px;border:2px solid var(--green);border-radius:3px}
+.todo li::after{content:"";position:absolute;left:11px;top:20px;width:7px;height:13px;border:solid var(--green);border-width:0 3px 3px 0;transform:rotate(45deg) scale(0);transition:transform .4s}
+.todo.on li::after{transform:rotate(45deg) scale(1)}
+
+/* verdict */
+.verdict{max-width:var(--w);margin:2.2em auto 1.4em;position:relative;text-align:center;padding:10px 0}
+.stamp{display:inline-block;font-family:var(--display);font-weight:800;font-size:clamp(22px,3.2vw,32px);line-height:1.2;color:var(--red);border:4px double var(--red);padding:16px 24px;transform:rotate(-2.5deg);transition:transform .45s cubic-bezier(.3,1.6,.5,1),opacity .3s;max-width:640px;background:var(--card);box-shadow:0 20px 40px -20px rgba(0,0,0,.6)}
+.js .stamp:not(.on){transform:rotate(-2.5deg) scale(1.4);opacity:0}
+.js .stamp.on{transform:rotate(-2.5deg) scale(1);opacity:1}
+.dark{background:var(--ink);color:var(--paper);background-image:none}
+.dark .prose h3::before{color:var(--marker)}
+.dark a{color:#9fbbea}
+
+/* references */
+.refs{font-size:15.5px;line-height:1.55;padding-left:0;list-style:none}
+.refs li{padding-left:2em;text-indent:-2em;margin:0 0 .8em;overflow-wrap:anywhere}
+.refs-search{width:100%;max-width:var(--w);font-family:var(--mono);font-size:14px;padding:10px 14px;border:1px solid var(--line);background:var(--card);margin:0 0 18px}
+footer{text-align:center;font-family:var(--mono);font-size:12px;color:var(--ink-soft);padding:30px 20px 50px}
+
+.js .reveal{opacity:0;transform:translateY(18px);transition:opacity .7s ease,transform .7s ease}
+.js .reveal.on{opacity:1;transform:none}
+.to-top{position:fixed;right:18px;bottom:18px;width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:var(--card);font-family:var(--mono);font-size:18px;cursor:pointer;opacity:0;pointer-events:none;transition:opacity .3s;color:var(--ink)}
+.to-top.show{opacity:1;pointer-events:auto}
+
+@media (max-width:960px){
+  .hero{grid-template-columns:1fr;gap:40px;padding-top:44px}
+  .tabs{grid-template-columns:repeat(2,1fr)}
+  .fig1-grid{grid-template-columns:1fr}
+  .steps{grid-template-columns:1fr 1fr}
+  .steps li::after{display:none}
+  .brand{display:none}
+  .route{margin-left:0}
+}
+@media (max-width:640px){
+  body{font-size:17.5px}
+  .tabs{grid-template-columns:1fr}
+  .steps{grid-template-columns:1fr}
+  .memo{padding:26px 20px 18px;transform:none}
+  .figure{padding:16px 12px 14px}
+  .wide{margin-left:-4px;margin-right:-4px}
+  table.census th,table.census td{padding:9px 8px}
+  .chapter{padding:30px 16px 56px}
+  .hero,.index{padding-left:16px;padding-right:16px}
+  .route a{padding:6px 8px}
+  .route a em{display:none}
+  .dots{gap:3px}
+  .exp-row{grid-template-columns:110px 1fr 38px;font-size:11.5px}
+  table.gaps thead,table.bill thead{display:none}
+  table.gaps tr,table.bill tr{display:block;border-bottom:2px solid var(--line);padding:8px 0}
+  table.gaps th,table.gaps td,table.bill th,table.bill td{display:block;width:auto !important;border:none;padding:6px 14px}
+  table.gaps td::before,table.bill td::before{content:attr(data-label);display:block;font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:2px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{transition:none !important;animation:none !important}
+  .js .reveal,.js .stamp:not(.on){opacity:1;transform:none}
+  .hero h1 .strike::after{transform:scaleX(1)}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-in">
+    <a class="brand" href="#top">PLS 419 · Final project</a>
+    <ol class="route" id="route">
+      <li><a href="#problem"><span>1</span><em>Problem</em></a></li>
+      <li><a href="#data"><span>2</span><em>Data</em></a></li>
+      <li><a href="#research"><span>3</span><em>Research</em></a></li>
+      <li><a href="#solution"><span>4</span><em>Solution &amp; bill</em></a></li>
+      <li><a href="#verdict"><span>✓</span><em>Verdict</em></a></li>
+      <li><a href="#transparency"><span>i</span><em>AI &amp; sources</em></a></li>
+    </ol>
+  </div>
+  <div class="progress" id="progress"></div>
+</header>
+
+<main id="top">
+
+<section class="hero">
+  <div>
+    <p class="kicker">Kazakhstan · Older workers · AI</p>
+    <h1><span class="strike">An office</span> <span class="rewrite">that AI is rewriting</span></h1>
+    <p class="hero-lead">Read it like a case file: the problem → the data → the research → an AI solution and its bill → a verdict.</p>
+  </div>
+  <article class="memo">
+    <div class="memo-tag">Why this project</div>
+    <p>I do not know why but accidentally Threads has become my favorite social media. Recently, I was reading a lot of stories of people who lost their jobs because of AI. I was reading comments under such posts, they usually have a lot of comments. People shared more and more stories about losing job to AI. But I was not bothered about myself, I was becoming anxious for older workers. For example, my father has a clerical job. His job still needs a lot of human interaction, but “what will happen in the future?” I thought. So several days later, my dad said they are having a lecture on how to integrate AI to their job. Company created a special AI agent for their department. I asked my dad how he feels about it. He said it seems very helpful, It will fix several difficulties they often faced, but at the same time, he became a little bit anxious too.</p>
+    <p>But its more than just about my dad. There are thousands of older workers who are a clerical jobs in Kazakhstan, who probably feel the same. So in this project I want to find out what effect does AI has on this group. And maybe the thing they are worried about can actually help them?</p>
+  </article>
+</section>
+
+<nav class="index" aria-label="Sections">
+  <p class="index-label">The case file</p>
+  <ol class="tabs">
+    <li><a href="#problem" style="--c:var(--red)"><b>01</b><i>The problem</i></a></li>
+    <li><a href="#data" style="--c:var(--amber)"><b>02</b><i>Background &amp; data</i></a></li>
+    <li><a href="#research" style="--c:var(--blue)"><b>03</b><i>Current state of research</i></a></li>
+    <li><a href="#solution" style="--c:var(--green)"><b>04</b><i>AI solution &amp; the bill</i></a></li>
+    <li><a href="#verdict" style="--c:var(--ink)"><b>→</b><i>The verdict</i></a></li>
+  </ol>
+</nav>
+
+<!-- ============ 1. PROBLEM ============ -->
+<section class="chapter" id="problem" style="--c:var(--red)">
+  <div class="folder-tab">Section 1 · The problem</div>
+  <h2 class="sec-title">The problem: older clerks in an office that AI is rewriting</h2>
+  <div class="prose">
+    <p>This project focuses on workers who are aged 50 and above and work at clerical jobs. This is because clerical workers are the ones who are most exposed to AI. According to International Labor Organization, every fourth worker in the world can be somewhat exposed to AI, and clerical workers are the ones that are exposed the most  (Gmyrek et al., 2025). Also, it is important to acknowledge that clerical jobs is the important sector for female employment, which means that AI effects are highly gendered.</p>
+    <h3><strong>What about Kazakhstan?</strong></h3>
+    <p>We can see that already happening in Kazakhstan, Kazakhtelecom’s CEO Bagdat Musin stated that due to the AI it is expected to cut 5000 employees out of 8000 in the next 2-3 years. He explained that one worker with AI agents is able to replace the whole department. (Kazhenova, 2026). However, it is not planned to fire people, but rather change will happen gradually, by not recruiting new employees after the current workers will retire. It is interesting how Bagdat Musin said At the Paryz NEF 2026, that before, jobs that are connected to physical work were perceived as less prestigious, while now, there are next millionaires. (Bagdat Musin, quoted in Kazhenova, 2026). There were cuts of jobs in other companies in 2026 too, but it is hard to say whether the cause of it is AI. Samruk-Kazyna removed 729 administrative posts and KTZ cut 221 administrative staff (Kazhenova, 2026). But, officially, the reason is optimization, with no mention of AI being involved. So, there is a difficulty to say if it is ordinary cost-cutting or AI. This makes the problem hard to measure.</p>
+  </div>
+  <div class="wide reveal">
+    <figure class="figure" style="margin:0">
+      <span class="visual-tag">Visual</span>
+      <p class="fig-cap">Kazakhtelecom: 5000 of 8000 employees expected to be cut in the next 2-3 years</p>
+      <div class="dots" id="dots" role="img" aria-label="80 dots, 50 of them outlined in red: 5000 of 8000 employees"></div>
+      <div class="legend"><span style="--k:var(--ink)">1 dot = 100 employees</span><span class="o">expected to be cut</span></div>
+      <p class="fig-note">Source: Kazhenova, 2026</p>
+    </figure>
+  </div>
+  <div class="prose">
+    <h3><strong>Scale</strong></h3>
+    <p>Government states that by 2035, 41% of jobs will be affected by AI in some way. And only less than 1% of occupations will be fully replaced by AI (Inbusiness.kz, 2026). Which is comforting, right? There is no risk of unemployment, only jobs will change. But at the same time, the amount of workers who are above 50 is also growing. Between 2009 and 2021, the number of employed workers who are 50+ rose by 77% (BNS, 2023). Also, it is known that the age of retirement rises, and it is expected that the retirement age for women will be 63 in 2031  (Government of Kazakhstan, n.d.) (The retirement age of women right now is 61). This shows us that at the same time when AI affects jobs, there will be more older workers. </p>
+    <p>It is already acknowledged by the government that employment of older workers is the problem that our country faces. It can be seen from the “Silver age” programme, that tries to motivate employers recruit 50+ workers, by paying 70% of employees salary in the first year. In third year, government pays for 60% of employees’  wages. In 2024, 19,200 people were referred to this programme (Togyzbayeva, 2025), and in January to September 2026 another 10,300 joined, 55% of them women (Rakhimova, 2026; Azattyq Ruhy, 2026).</p>
+    <h3><strong>The social science question</strong></h3>
+    <p>If we read this, there is an assumption that we should not be worried about older workers, as the cut is supposed to be natural, no one is planning to fire people without reason. And instead, we need to worry about young specialists who will not be able to find a job, due to the fact that positions will close after previous workers retire. But there are some things that are not so vivid. Firstly, older workers may be encouraged to leave “voluntarily”. Secondly, the workers that are not cut, are the ones who are trained to work with AI. And it is on employers to decide who gets training. And lastly, if older worker actually gets cut, the job market situation makes it hard for them to find a new job, so the state needs to subsidize their salary.</p>
+    <div class="callout"><p><span class="marker">So the problem is not only whether AI will replace older clerical workers, but also who decides how the cost of this transition is shared, and why older clerical workers have little say in this issue.</span></p></div>
+  </div>
+</section>
+
+<!-- ============ 2. DATA ============ -->
+<section class="chapter" id="data" style="--c:var(--amber)">
+  <div class="folder-tab">Section 2 · Background &amp; data</div>
+  <h2 class="sec-title"><strong>2.Background and data</strong></h2>
+  <div class="prose">
+    <h3><strong>What is measured</strong></h3>
+    <p>According to the Bureau of National Statistics (BNS), in 2026 there are 9.40 mln of employed people, with an unemployment rate being 4.5%. Also it provides information about the youth employment and employment by sectors. There is also data from the 2021 census with employment by sex and by age groups. According to Gmyrek et al. (2025), the ILO index shows the tasks that can be replaced by AI.  The Ministry of Labour counts programme participants, and companies publish their own plans.</p>
+    <h3><strong>Data shows that..</strong></h3>
+    <p>The figure 1 shows the comparison between two censuses, in 2009 and 2021. It can be seen that the number of people working grew significantly at older ages. While the number of employed people above 50 rose by 77%, for people under 50 the increase is only by 31%. So, the share of 50+ employed people increased from 18% to 22.9%. Interestingly, the most significant increase is seen at 60-64 age group, the numbers more than tripled. Even more significant increase in seen for women at this age group, from 28,806 to 132,828,  which is a 4.6-fold increase. One of the reasons is the increase of retirement age for women, which was 58 at 2017 and started to increase in 2018 (OECD, 2017; Gazizova et al., 2021). Which means that in 2021, the retirement age for women was 60.5. This means that in the offices there are more and more older workers, mostly women.</p>
+  </div>
+  <div class="wide reveal">
+    <figure class="figure" style="margin:0">
+      <p class="fig-cap">[Figure 1]</p>
+      <div class="fig1-grid">
+        <div>
+          <span class="visual-tag">Chart drawn from the table</span>
+          <div id="chart1" role="img" aria-label="Bar chart of employed people by age group, 2009 and 2021"></div>
+          <div class="legend"><span class="k09">2009</span><span class="k21">2021</span><span class="k50">2021, aged 50+</span></div>
+        </div>
+        <div><div class="table-wrap"><table class="census"><thead><tr><th scope="col">Age</th><th scope="col">2009</th><th scope="col">2021</th><th scope="col">Change</th></tr></thead><tbody><tr><th scope="row" data-label="Age">15–19</th><td data-label="2009">186,462</td><td data-label="2021">211,680</td><td data-label="Change">+14%</td></tr><tr><th scope="row" data-label="Age">20–24</th><td data-label="2009">890,161</td><td data-label="2021">757,192</td><td data-label="Change">−15%</td></tr><tr><th scope="row" data-label="Age">25–29</th><td data-label="2009">940,849</td><td data-label="2021">1,225,738</td><td data-label="Change">+30%</td></tr><tr><th scope="row" data-label="Age">30–34</th><td data-label="2009">885,483</td><td data-label="2021">1,450,585</td><td data-label="Change">+64%</td></tr><tr><th scope="row" data-label="Age">35–39</th><td data-label="2009">856,670</td><td data-label="2021">1,299,367</td><td data-label="Change">+52%</td></tr><tr><th scope="row" data-label="Age">40–44</th><td data-label="2009">818,234</td><td data-label="2021">1,123,860</td><td data-label="Change">+37%</td></tr><tr><th scope="row" data-label="Age">45–49</th><td data-label="2009">835,643</td><td data-label="2021">1,019,974</td><td data-label="Change">+22%</td></tr><tr class="older"><th scope="row" data-label="Age">50–54</th><td data-label="2009">633,419</td><td data-label="2021">871,562</td><td data-label="Change">+38%</td></tr><tr class="older"><th scope="row" data-label="Age">55–59</th><td data-label="2009">386,649</td><td data-label="2021">721,320</td><td data-label="Change">+87%</td></tr><tr class="older"><th scope="row" data-label="Age">60–64</th><td data-label="2009">120,657</td><td data-label="2021">395,160</td><td data-label="Change">+228%</td></tr><tr class="older"><th scope="row" data-label="Age">65–72</th><td data-label="2009">35,151</td><td data-label="2021">92,739</td><td data-label="Change">+164%</td></tr><tr class="older"><th scope="row" data-label="Age">73+</th><td data-label="2009">10,118</td><td data-label="2021">18,836</td><td data-label="Change">+86%</td></tr><tr class="total"><th scope="row" data-label="Age">Total</th><td data-label="2009">6,599,496</td><td data-label="2021">9,188,013</td><td data-label="Change">+39%</td></tr></tbody></table></div></div>
+      </div>
+    </figure>
+  </div>
+  <div class="prose">
+    <h3><strong>Silent data</strong></h3>
+    <p>I could not find the data about how much there are clerical workers who are aged 50 and above in Kazakhstan. While the statistics from BNS provides data about employment based on sector and sex, the data from the census shows information about the age. However, there is no information that adds this up. Here, Figure 2 shows the gaps that I faced.</p>
+  </div>
+  <div class="wide reveal">
+    <figure class="figure" style="margin:0">
+      <p class="fig-cap"><strong>Figure 2</strong></p>
+      <div class="table-wrap"><table class="gaps"><thead><tr><th scope="col">Question</th><th scope="col">Status</th><th scope="col">What exists, and the gap</th></tr></thead><tbody><tr><th scope="row" data-label="Question">How many people are employed, by age?</th><td data-label="Status"><span class="badge b-ok">Measured</span></td><td data-label="What exists, and the gap">The 2009 and 2021 censuses give exact counts by age and sex (Figure 1). But 2021 is before ChatGPT launched, so it shows the workforce before generative AI.</td></tr><tr><th scope="row" data-label="Question">How many clerks are aged 50+?</th><td data-label="Status"><span class="badge b-silent">Silent</span></td><td data-label="What exists, and the gap">No published table crosses occupation with age in the BNS releases and census volumes I checked.</td></tr><tr><th scope="row" data-label="Question">How exposed is a Kazakhstani clerk’s job to AI?</th><td data-label="Status"><span class="badge b-borrowed">Borrowed</span></td><td data-label="What exists, and the gap">The ILO index scores occupations globally. A Kazakhstani clerk works in two languages, with more paper and face-to-face service, so real exposure may differ.</td></tr><tr><th scope="row" data-label="Question">How many jobs has AI already removed?</th><td data-label="Status"><span class="badge b-silent">Silent</span></td><td data-label="What exists, and the gap">Companies report “optimization”, and only some name AI. Cuts by not replacing leavers never appear in unemployment numbers, because nobody is dismissed.</td></tr><tr><th scope="row" data-label="Question">What happens to older people who lose an office job?</th><td data-label="Status"><span class="badge b-silent">Silent</span></td><td data-label="What exists, and the gap">Someone who stops looking counts as “outside the labour force” (4.76 million people in mid-2026), not as unemployed. Early, unwanted retirement is invisible.</td></tr><tr><th scope="row" data-label="Question">Do programmes for over-50s work?</th><td data-label="Status"><span class="badge b-inputs">Inputs only</span></td><td data-label="What exists, and the gap">The ministry counts participants, but a 2025 review found no approved method for assessing whether its labour programmes are effective (Togyzbayeva, 2025).</td></tr></tbody></table></div>
+    </figure>
+  </div>
+  <div class="prose">
+    <h3><strong>Limitations and reliability of the available data</strong> </h3>
+    <p>The census from the data includes everyone, but it is already 5 years old. Taking into account that this data is about the times before the emergence of ChatGPT is especially important. Although the government states that 41% of occupations will be somehow affected by AI, and only less than 1% will be automated fully, there is still no published methods on how this data was calculated. Therefore, we can not check the verifiability<strong> </strong>of these numbers. Regarding the data from the companies, they still talk only about the intentions, not the real numbers. Also, the exposure score tells about what can be done by AI, but it does not talk about what employers choose to do.</p>
+    <div class="callout"><p>The important thing is that here, silence matters a lot. Older workers who are silently pushed out are actually hidden in this information gap. This is because they are not counted in a separate group, no data about how much of them is replaced by AI, and when they give up on finding a job, they are not counted as unemployed. So, if the country is worried about this group, first, the data should be available.</p></div>
+  </div>
+</section>
+
+<!-- ============ 3. RESEARCH ============ -->
+<section class="chapter" id="research" style="--c:var(--blue)">
+  <div class="folder-tab">Section 3 · Current state of research</div>
+  <h2 class="sec-title"><strong>3. Current state of research</strong></h2>
+  <div class="prose">
+    <div class="callout"><p>When I started the research, I was quite confident that older clerical workers are the ones that are going to be affected the most. However, it showed that this is not the most vulnerable group. But still, they are the worst at recovering in case they are hit by AI.</p></div>
+    <h3><strong>What jobs can AI do?</strong></h3>
+    <p>There is a number of research that shows how many occupations include tasks that AI can do. According to Felten, Raj and Seamans (2021), occupations that are exposed the most are the financial, accounting and insurance sectors. Eloundou et al. (2024) stated that in the US about 19% of workers’ tasks are exposed to LLMs. Importantly, according to the ILO, 24% of clerical tasks have a high exposure to AI, when 58% have moderate exposure (Gmyrek et al., 2023). In the data from 2025, rating exposure to AI from 0 to 1, data entry clerks’ exposure rate is 0.70, bookkeeping clerks’ is 0.64, and bank tellers and contact centre clerks 0.58 each (Gmyrek et al., 2025). Even the IMF acknowledged the risks clerical workers face and stated that they are the most exposed group and the most underprotected, which puts them in the highest risk category of being displaced (Cazzaniga et al., 2024).</p>
+    <figure class="figure reveal" style="margin:1.4em 0 1.6em">
+      <span class="visual-tag">Visual</span>
+      <p class="fig-cap">Exposure to AI, from 0 to 1 (Gmyrek et al., 2025)</p>
+      <div id="exposure">
+        <div class="exp-row"><span>Data entry clerks</span><div class="exp-track"><div class="exp-fill" data-v="0.70"></div></div><b>0.70</b></div>
+        <div class="exp-row"><span>Bookkeeping clerks</span><div class="exp-track"><div class="exp-fill" data-v="0.64"></div></div><b>0.64</b></div>
+        <div class="exp-row"><span>Bank tellers</span><div class="exp-track"><div class="exp-fill" data-v="0.58"></div></div><b>0.58</b></div>
+        <div class="exp-row"><span>Contact centre clerks</span><div class="exp-track"><div class="exp-fill" data-v="0.58"></div></div><b>0.58</b></div>
+      </div>
+    </figure>
+    <p>However, it is important to note that exposure measures only what tasks AI is able to do, it does not necessarily tells about the decisions employers will make. Also, the data that was discussed above is mostly collected from the US or global data, and there is a little information about the age of workers.</p>
+    <h3><strong>But who actually loses?</strong></h3>
+    <p>According to Brynjolfsson, Chandar and Chen (2025), who analyzed the US payroll data, the employment of people aged 22-25 fell by 13% in the job sectors that are exposed to AI, comparing it to the sectors that are less exposed. Moreover, the data for August 2026 showed that this pattern is continuing and the figure now increased for 19%. Comparing it to the older workers, the change for them is not so significant. The ILO finds the data for the countries that are close to Kazakhstan’s income level, which is upper-middle income classes. That data states that the risk of automatization for workers aged 16-35 is 10.4%, compared to 4.3% for the workers aged 56-65 (Gmyrek, Viollaz &amp; Winkler, 2026). In other words, AI makes it harder to open the door for the young specialists.</p>
+    <p>	However, there are other findings that should be taken into account. According to Friedberg (2003), older workers tend to not learn new tools, because their retirement is near. This also affected the choice of french companies that planed to adapt new technologies and therefore were less likely to hire older workers (Aubert, Caroli &amp; Roger, 2006). According to Koster and Brunori ( 2021), workers that have automatable jobs tend to train less, and older workers (50-64) are 36-38% less likely to receive training in recent years compared to workers aged 15-24. Moreover, according to Cazzaniga et al. (2024), older workers that lost their jobs are less likely to find a new job within a year in Brazil and the UK. Therefore, although older workers are not at the high risk groups, still they are the worst protected. </p>
+    <h3><strong>Gender</strong></h3>
+    <p>When examining 30 countries, 20% of women work at clerical jobs, while for men the percentage is only 8%, and also women are 40% more likely to face the risk of automation (Brussevich et al., 2019). In Eurasia and Central Asia 38% of women employment is exposed to AI, while for men the percentage is only 26% (Gmyrek et al., 2025). Taking this into consideration, it makes older clerical workers to be one of the groups of high risks.</p>
+    <h3><strong>Kazakhstan: older workers and AI, studied separately</strong></h3>
+    <p>The OECD (2017) acknowledged the difficulties older workers tend to face connected to employment due to their age, and called them underused resource, because their activity is quite low. Gazizova, Khussainova and Vechkinzova (2021), examined older workers in Kazakhstan, using the BNS data, but did not connect it to occupations and technologies. Moreover, the survey by OECD (2019) found that the literacy level for people aged 55 to 65 is the same as for people aged 25-34. This makes an assumptions that if older workers are at the positions where they are left behind, it it rather due to the unavailability of training or employers’ choice, than a real gap in the skills. Buribayeva, Khamzina and Buribayev (2026) studied the impact of AI to civil cervantes, and concluded that AI can cause workers to gradually lose their skills, but they did not analyze age separately.</p>
+    <h3><strong>The gap that this project addresses</strong></h3>
+    <div class="callout"><p><span class="marker">From the global research, there is evidence that clerical workers are the ones who are at the higher risk of AI replacement, and although older workers are not the ones to hit first, they are the worst protected and the worst at recovering in case they lose their job. From the found research from Kazakhstan there is no data about the older workers connected to AI. And those studies that analyze AI do not analyze the change by age.  Nobody has put AI exposure, age and gender together for Kazakhstan’s clerks aged 50 and over. For them, the real risk is what happens after the cuts.</span></p></div>
+  </div>
+</section>
+
+<!-- ============ 4. SOLUTION ============ -->
+<section class="chapter" id="solution" style="--c:var(--green)">
+  <div class="folder-tab">Section 4 · The AI-assisted solution &amp; the bill</div>
+  <h2 class="sec-title"><strong>4. The AI-assisted solution, and what it would cost</strong></h2>
+  <div class="prose">
+    <h3><strong>The best solution I could think of </strong></h3>
+    <p>If Kazakhstan wanted to address this issue with the help of AI, it would not be the first attempt. In July 2026, the Ministry of Labour&#x27;s Digital Employment Service started an initiative that created a CV for people looking for a job with their consent. Then, it proposes relevant vacancies, which makes the search easier. In Pavlodar and Mangystau region 59200 people tried the system and 7500 people found a job using it. This is data from July to November 2026 (Finratings.kz, 2026). This programme targets people who lost a job in the last 3 months, people who recently graduated, and people who are officially registered as unemployed. The focus on age is not mentioned (Bizmedia.kz, 2026). </p>
+    <p>So I believe that a good proposal would be modifying existing service by adding a special features for older workers. Firstly, the service can reach out to a worker not after they lost their job, but once their employers announce the cut of places due to automation. Secondly, it can offer workers occupations based on their skills that they performed at a prior occupation, rather than just offering another clerical job. I also believe it is important for the model to work by voice in Russian and Kazakh languages, as it will make communication easier for people who are less comfortable with digital interfaces. Moreover, the platform should work on small, task-specific models, rather than relying on huge expensive AI model. World Bank calls it “small AI”, which is a tool that is designed to work on daily basis for the certain range of tasks and do not require big and expensive digital infrastructure (World Bank, 2025).</p>
+    <h4>How the 50+ track would work:</h4>
+  </div>
+  <div class="steps-wrap">
+    <ol class="steps reveal">
+<li><strong>Talk, not type.</strong> The worker calls and describes her tasks in Kazakh or Russian: &quot;I reconcile payments and prepare contracts&quot;.</li>
+<li><strong>Skills profile.</strong> A small model turns the description into skills; a counsellor checks it with her.</li>
+<li><strong>Matches.</strong> Nearby occupations and live vacancies, including Silver Age employers, spread across different openings.</li>
+<li><strong>A person decides.</strong> Counsellor and worker choose a plan. The tool never decides who deserves support.</li>
+    </ol>
+  </div>
+  <div class="prose">
+    <h3><strong>Same experience across the globe</strong></h3>
+    <p>Denmark tested a public job portal that suggested alternative occupations to 92,000 unemployed people (Altmann, Glenny, Mahlstedt &amp; Sebald, 2022). The results were positive, but only when fewer than half of jobseekers received the same advice: they worked and earned 8.5–9.5% more over the next year. When too many people received similar recommendations, they competed for the same vacancies and the benefits disappeared.</p>
+    <p>Sweden introduced an AI system on its national job board that made 59 million personalised job suggestions (Le Barbanchon, Hensvik &amp; Rathelot, 2023). Applications to recommended jobs increased by 31%, while employment rose by around 0.4 percentage points. The effect was real, but modest. In Estonia, employment counsellors have used AI since 2020 to estimate jobseekers&#x27; chances of finding work. The system explains its predictions, but counsellors make the final decisions (Leinuste, 2021; OECD.AI, 2026). Its accuracy, however, is self-reported.</p>
+    <p>Not every example is positive. Austria&#x27;s employment agency used an algorithm to decide which jobseekers should receive more or less support. Being over 50 and being a woman with caring responsibilities could negatively affect a person&#x27;s score (Allhutter et al., 2020). In Poland, counsellors rarely challenged the algorithm because they had too little time. They overrode its recommendations in fewer than 1% of cases, and the Constitutional Tribunal ruled the system unconstitutional in 2018 (Niklas, 2019; Polish Constitutional Tribunal, 2018).</p>
+    <p>But even when these systems work, the benefits are not shared equally. In Sweden, the effects were larger for workers under 35. In Switzerland, skill-based matching helped people whose jobs did not match their skills and those with little work experience, but did not benefit long-serving employees to the same extent (Bächli et al., 2025). A World Bank experiment in Nigeria found a similar pattern in education: students who already had stronger skills benefited more from AI tutoring (De Simone et al., 2025).</p>
+    <div class="callout"><p>This raises an important question for Kazakhstan: would these services work just as well for a 55-year-old clerk as for a young graduate? None of the trials discussed here reports separate results for people over 50. AI can help people find jobs, but we still do not know whether older workers benefit in the same way.</p></div>
+    <h3 id="bill"><strong>The bill</strong></h3>
+    <p>What an AI 50+ track in the Digital Employment Service would cost:</p>
+  </div>
+  <div class="wide reveal">
+    <div class="table-wrap"><table class="bill"><thead><tr><th scope="col">Cost</th><th scope="col">What it is</th><th scope="col">Weight</th></tr></thead><tbody><tr><th scope="row" data-label="Cost">Environmental</th><td data-label="What it is">About 75% of Kazakhstan&#x27;s electricity came from coal in 2024 (Samruk-Energy, 2025), the strongest argument for small models. In benchmarks, a task-specific text classifier produced 0.32 g of CO₂ per 1,000 queries, against 2.66 to 4.67 g for general-purpose models doing the same task (Luccioni, Jernite &amp; Strubell, 2024). Large chatbots also drink cooling water: about 500 ml per 10 to 50 GPT-3 responses (Li et al., 2025).</td><td data-label="Weight"><span class="badge b-low">Low, if kept small</span></td></tr><tr><th scope="row" data-label="Cost">Economic</th><td data-label="What it is">The state pays. Building on the existing service is cheaper than a new system, but not cheap: France&#x27;s employment agency spent €93 million on AI in 2017 to 2024, and auditors estimated gains of €85 to 120 million, only roughly balancing the costs (Fauvel, 2026). Meanwhile the profit from automation goes to employers: a company cutting 5,000 office jobs saves their salaries.</td><td data-label="Weight"><span class="badge b-mid">Moderate</span></td></tr><tr><th scope="row" data-label="Cost">Labour</th><td data-label="What it is">Counsellors shift toward checking AI suggestions; without time, they rubber-stamp, as in Poland. The speech model needs Kazakh and Russian voice data labelled by people, the hidden data work that is often low-paid and invisible (Tubaro et al., 2020; Williams &amp; Miceli, 2023).</td><td data-label="Weight"><span class="badge b-mid">Moderate</span></td></tr><tr><th scope="row" data-label="Cost">Political and governance</th><td data-label="What it is">A tool that helps jobseekers can be turned into one that sorts them, as Austria shows. Kazakhstan&#x27;s AI law helps: it bans social scoring, gives people the right to object to automated processing and refuse AI interaction, and keeps the final decision with a person in low-autonomy systems (Law No. 230-VIII, 2025, Arts. 7, 16, 17). Personal data must stay in Kazakhstan (DLA Piper, 2026). But the ministry has not disclosed which state data the service uses to find people (Finratings.kz, 2026).</td><td data-label="Weight"><span class="badge b-high">High</span></td></tr><tr><th scope="row" data-label="Cost">Data ethics</th><td data-label="What it is">The track would need a person&#x27;s work history, skills and voice, and would watch employers&#x27; cut announcements. Consent is fragile when support depends on it, and age must never be used to rank people, though it must be recorded to check who is helped.</td><td data-label="Weight"><span class="badge b-high">High</span></td></tr><tr><th scope="row" data-label="Cost">What it buys</th><td data-label="What it is">For people over 50: unproven. No study, abroad or in Kazakhstan, shows a gain for this age group.</td><td data-label="Weight"><span class="badge b-unknown">Unknown</span></td></tr></tbody></table></div>
+  </div>
+</section>
+
+<!-- ============ VERDICT ============ -->
+<section class="chapter dark" id="verdict" style="--c:var(--marker)">
+  <div class="folder-tab">The verdict</div>
+  <div class="verdict"><div class="stamp" id="stamp"><strong>Verdict: should Kazakhstan build it? No, and here is why.</strong></div></div>
+  <div class="prose">
+    <p>I believe that Kazakhstan should not come up with an AI solution for this problem. Firstly, it solves the wrong problem. Older workers are stuck not due to the problem with searching for a suitable job, but because employers are less inclined to hire older workers. This can be seen from the Silver age programme. Although stats is already offers to subsidize up to 70% of workers’ wages. Firms adopting new technology hire fewer older workers (Aubert et al., 2006), and older workers take longer to find new jobs (Cazzaniga et al., 2024). A faster search does not change who gets hired. Secondly, it could actually increase the gap it tries to address. That is, younger people are always better at technologies and evidence actually shows that this model helps younger people the most. And lastly, while costs are pretty evident, the benefits are still unclear. The governance and data risks are high and real. The gain for people over 50 has never been measured.</p>
+    <h3><strong>What can be done instead</strong></h3>
+    <h4><strong>What Kazakhstan should do instead</strong></h4>
+    <ol class="todo" id="todo">
+<li><strong>Count the group.</strong> BNS should publish employment by occupation and age, so the number of older clerks stops being unknown.</li>
+<li><strong>Make quiet cuts visible.</strong> Employers must already tell career centres about layoffs a month ahead (Social Code, Art. 103, in Bizmedia.kz, 2026). Cuts by not replacing leavers should be reported too, so help reaches people before the job disappears.</li>
+<li><strong>Spend on what targets this group.</strong> More human counsellors and a bigger Silver Age programme.</li>
+<li><strong>Those who automate help pay.</strong> Firms announcing AI-driven cuts should co-fund their workers&#x27; transition.</li>
+    </ol>
+    <h4><strong>What would change my mind</strong></h4>
+    <div class="callout" style="background:rgba(255,255,255,.06);color:inherit"><p>If the Digital Employment Service publishes results by age, and they show that people over 50 gain, my answer becomes yes, under conditions: it matches jobs to people and never scores them, a counsellor decides, models stay small and local, and saying no costs nothing.</p></div>
+    <h4><strong>Conclusion</strong></h4>
+    <p style="font-size:22px;font-family:var(--display)">I started by asking whether the thing older workers worry about could help them. My answer is: not yet, and not in the way people expect. AI can help those like my father search for a job. It cannot decide whether anyone will hire them.</p>
+  </div>
+</section>
+
+<!-- ============ TRANSPARENCY & REFERENCES ============ -->
+<section class="chapter" id="transparency" style="--c:var(--ink-soft)">
+  <div class="folder-tab">AI &amp; sources</div>
+  <div class="prose">
+    <h2 class="sec-title" style="margin-left:0"><strong>AI Transparency Statement</strong></h2>
+    <div class="callout"><p style="margin-bottom:1em">I used AI as a research and technical assistance tool during this project. It helped me identify relevant academic sources, reports and international case studies, as well as organise and explore information related to the topic. I also used AI to assist with creating and developing the project website.</p><p>However, all the wording and written content of the project are my own. I reviewed the sources, selected the information relevant to my research, and made the final decisions about the arguments, analysis and proposed solution.</p></div>
+    <h3 id="references"><strong>References</strong></h3>
+    <input class="refs-search" id="refsearch" type="search" placeholder="Filter references…" aria-label="Filter references">
+    <ul class="refs" id="refs">
+<li>Allhutter, D., Cech, F., Fischer, F., Grill, G., &amp; Mager, A. (2020). Algorithmic profiling of job seekers in Austria: How austerity politics are made effective. <em>Frontiers in Big Data, 3</em>, Article 5. <a href="https://doi.org/10.3389/fdata.2020.00005" target="_blank" rel="noopener">https://doi.org/10.3389/fdata.2020.00005</a></li>
+<li>Altmann, S., Glenny, A. M., Mahlstedt, R., &amp; Sebald, A. (2022). <em>The direct and indirect effects of online job search advice</em> (IZA Discussion Paper No. 15830). IZA Institute of Labor Economics. <a href="https://docs.iza.org/dp15830.pdf" target="_blank" rel="noopener">https://docs.iza.org/dp15830.pdf</a></li>
+<li>Aubert, P., Caroli, E., &amp; Roger, M. (2006). New technologies, organisation and age: Firm-level evidence. <em>The Economic Journal, 116</em>(509), F73–F93. <a href="https://doi.org/10.1111/j.1468-0297.2006.01065.x" target="_blank" rel="noopener">https://doi.org/10.1111/j.1468-0297.2006.01065.x</a></li>
+<li>Azattyq Ruhy. (2026, October 25). <em>Kazakhstantsam starshe 50 let pomogayut naiti rabotu s gospodderzhkoi do trekh let</em>[Kazakhstanis over 50 helped to find work with state support for up to three years]. <a href="https://rus.azattyq-ruhy.kz/news/118231-kazakhstantsam-starshe-50-let-pomogaiut-naiti-rabotu-s-gospodderzhkoi-do-trekh-let" target="_blank" rel="noopener">https://rus.azattyq-ruhy.kz/news/118231-kazakhstantsam-starshe-50-let-pomogaiut-naiti-rabotu-s-gospodderzhkoi-do-trekh-let</a></li>
+<li>Bächli, M., Lalive, R., &amp; Pellizzari, M. (2025). <em>Helping jobseekers with recommendations based on skill profiles or past experience: Evidence from a randomized intervention</em> (IZA Discussion Paper No. 17713). IZA Institute of Labor Economics. <a href="https://docs.iza.org/dp17713.pdf" target="_blank" rel="noopener">https://docs.iza.org/dp17713.pdf</a></li>
+<li>Bizmedia.kz. (2026, November 16). <em>Kak tsifrovaya sluzhba zanyatosti ishchet rabotu i mozhet li predupredit&#x27; o ee potere</em>[How the digital employment service looks for work, and whether it can warn of job loss]. <a href="https://bizmedia.kz/2026-11-16-kak-czifrovaya-sluzhba-zanyatosti-ishhet-rabotu-i-mozhet-li-predupredit-o-ee-potere/" target="_blank" rel="noopener">https://bizmedia.kz/2026-11-16-kak-czifrovaya-sluzhba-zanyatosti-ishhet-rabotu-i-mozhet-li-predupredit-o-ee-potere/</a></li>
+<li>Brussevich, M., Dabla-Norris, E., &amp; Khalid, S. (2019). <em>Is technology widening the gender gap? Automation and the future of female employment</em> (IMF Working Paper No. 19/91). International Monetary Fund. <a href="https://www.imf.org/en/publications/wp/issues/2019/05/06/is-technology-widening-the-gender-gap-automation-and-the-future-of-female-employment-46684" target="_blank" rel="noopener">https://www.imf.org/en/publications/wp/issues/2019/05/06/is-technology-widening-the-gender-gap-automation-and-the-future-of-female-employment-46684</a></li>
+<li>Brynjolfsson, E., Chandar, B., &amp; Chen, R. (2025). <em>Canaries in the coal mine? Six facts about the recent employment effects of artificial intelligence</em> [Working paper; the 13% figure is from the 2025 version, the 19% figure from the August 2026 update]. Stanford Digital Economy Lab. <a href="https://digitaleconomy.stanford.edu/app/uploads/2026/08/Canaries_August2026.pdf" target="_blank" rel="noopener">https://digitaleconomy.stanford.edu/app/uploads/2026/08/Canaries_August2026.pdf</a></li>
+<li>Bureau of National Statistics [BNS]. (2023). <em>Zanyatost&#x27; naseleniya v Respublike Kazakhstan. Tom I: Itogi Natsional&#x27;noi perepisi naseleniya Respubliki Kazakhstan 2021 goda</em> [Employment of the population of the Republic of Kazakhstan, Vol. I: Results of the 2021 National Population Census]. Agency for Strategic Planning and Reforms. <a href="https://new.stat.gov.kz/upload/medialibrary/b84/wsdp32l40a3yq6bw6guz2r9wqu98ed6l/%D0%97%D0%B0%D0%BD%D1%8F%D1%82%D0%BE%D1%81%D1%82%D1%8C%20%D0%BD%D0%B0%D1%81%D0%B5%D0%BB%D0%B5%D0%BD%D0%B8%D1%8F%201%20%D1%82%D0%BE%D0%BC.pdf" target="_blank" rel="noopener">https://new.stat.gov.kz/upload/medialibrary/b84/wsdp32l40a3yq6bw6guz2r9wqu98ed6l/Занятость%20населения%201%20том.pdf</a></li>
+<li>Bureau of National Statistics [BNS]. (2026). <em>Situatsiya na rynke truda (II kvartal 2026 goda)</em> [Labour market situation, Q2 2026]. Agency for Strategic Planning and Reforms. <a href="https://stat.gov.kz/api/iblock/element/511756/file/ru/" target="_blank" rel="noopener">https://stat.gov.kz/api/iblock/element/511756/file/ru/</a></li>
+<li>Buribayeva, M., Khamzina, Z., &amp; Buribayev, Y. (2026). Potential negative effects of artificial intelligence in Kazakhstan&#x27;s public sector: An analysis of hidden risks. <em>Frontiers in Artificial Intelligence, 9</em>, Article 1781993. <a href="https://doi.org/10.3389/frai.2026.1781993" target="_blank" rel="noopener">https://doi.org/10.3389/frai.2026.1781993</a></li>
+<li>Cazzaniga, M., Jaumotte, F., Li, L., Melina, G., Panton, A. J., Pizzinelli, C., Rockall, E. J., &amp; Tavares, M. M. (2024). <em>Gen-AI: Artificial intelligence and the future of work</em> (IMF Staff Discussion Note SDN/2024/001). International Monetary Fund. <a href="https://doi.org/10.5089/9798400262548.006" target="_blank" rel="noopener">https://doi.org/10.5089/9798400262548.006</a></li>
+<li>Constitutional Tribunal of the Republic of Poland. (2018, June 6). <em>Judgment K 53/16</em>. <a href="https://trybunal.gov.pl/en/hearings/judgments/art/10196-zarzadzanie-pomoca-kierowana-do-osob-bezrobotnych" target="_blank" rel="noopener">https://trybunal.gov.pl/en/hearings/judgments/art/10196-zarzadzanie-pomoca-kierowana-do-osob-bezrobotnych</a></li>
+<li>De Simone, M., Tiberti, F., Barron Rodriguez, M., Manolio, F., Mosuro, W., &amp; Dikoru, E. J. (2025). <em>From chalkboards to chatbots: Evaluating the impact of generative AI on learning outcomes in Nigeria</em> (Policy Research Working Paper No. 11125). World Bank. <a href="https://openknowledge.worldbank.org/entities/publication/15e1ff08-15ae-4f7a-b2a8-d146e6c113ee" target="_blank" rel="noopener">https://openknowledge.worldbank.org/entities/publication/15e1ff08-15ae-4f7a-b2a8-d146e6c113ee</a></li>
+<li>DLA Piper. (2026). <em>Data protection laws of the world: Kazakhstan</em>. <a href="https://www.dlapiperdataprotection.com/?t=law&amp;c=KZ" target="_blank" rel="noopener">https://www.dlapiperdataprotection.com/?t=law&amp;c=KZ</a></li>
+<li>Eloundou, T., Manning, S., Mishkin, P., &amp; Rock, D. (2024). GPTs are GPTs: Labor market impact potential of LLMs. <em>Science, 384</em>(6702), 1306–1308. <a href="https://doi.org/10.1126/science.adj0998" target="_blank" rel="noopener">https://doi.org/10.1126/science.adj0998</a></li>
+<li>Fauvel, V. (2026, January 9). La Cour des comptes salue l&#x27;usage fait de l&#x27;IA depuis 10 ans par France Travail. <em>Localtis, Banque des Territoires</em>. <a href="https://www.banquedesterritoires.fr/la-cour-des-comptes-salue-lusage-fait-de-lia-depuis-10-ans-par-france-travail" target="_blank" rel="noopener">https://www.banquedesterritoires.fr/la-cour-des-comptes-salue-lusage-fait-de-lia-depuis-10-ans-par-france-travail</a></li>
+<li>Felten, E., Raj, M., &amp; Seamans, R. (2021). Occupational, industry, and geographic exposure to artificial intelligence: A novel dataset and its potential uses. <em>Strategic Management Journal, 42</em>(12), 2195–2217. <a href="https://doi.org/10.1002/smj.3286" target="_blank" rel="noopener">https://doi.org/10.1002/smj.3286</a></li>
+<li>Finratings.kz. (2026, November 13). <em>Kazakhstantsam budut predlagat&#x27; vakansii bez zayavlenii: kak uznayut, komu nuzhna rabota</em> [Kazakhstanis will be offered vacancies without applying: how the state will know who needs work]. <a href="https://finratings.kz/news/17564-kazakhstantsam-budut-predlagat-vakansii-bez-zaiavlenii-kak-uznaiut-komu-nuzhna-rabota/" target="_blank" rel="noopener">https://finratings.kz/news/17564-kazakhstantsam-budut-predlagat-vakansii-bez-zaiavlenii-kak-uznaiut-komu-nuzhna-rabota/</a></li>
+<li>Friedberg, L. (2003). The impact of technological change on older workers: Evidence from data on computer use. <em>ILR Review, 56</em>(3), 511–529. <a href="https://doi.org/10.1177/001979390305600309" target="_blank" rel="noopener">https://doi.org/10.1177/001979390305600309</a></li>
+<li>Gazizova, M. R., Khussainova, Zh. S., &amp; Vechkinzova, Y. A. (2021). The impact of the working longevity of the &quot;silver generation&quot; on the Kazakhstani labor market. <em>Bulletin of the Karaganda University. Economy Series</em>, No. 1(101), 48–56. <a href="https://doi.org/10.31489/2021Ec1/48-56" target="_blank" rel="noopener">https://doi.org/10.31489/2021Ec1/48-56</a></li>
+<li>Gmyrek, P., Berg, J., &amp; Bescond, D. (2023). <em>Generative AI and jobs: A global analysis of potential effects on job quantity and quality</em> (ILO Working Paper No. 96). International Labour Organization. <a href="https://doi.org/10.54394/FHEM8239" target="_blank" rel="noopener">https://doi.org/10.54394/FHEM8239</a></li>
+<li>Gmyrek, P., Berg, J., Kamiński, K., Konopczyński, F., Ładna, A., Nafradi, B., Rosłaniec, K., &amp; Troszyński, M. (2025). <em>Generative AI and jobs: A refined global index of occupational exposure</em> (ILO Working Paper No. 140). International Labour Organization. <a href="https://doi.org/10.54394/HETP0387" target="_blank" rel="noopener">https://doi.org/10.54394/HETP0387</a></li>
+<li>Gmyrek, P., Viollaz, M., &amp; Winkler, H. (2026). <em>Disruption without dividend? How the digital divide and task differences split GenAI&#x27;s global impact</em> (ILO Working Paper No. 166). International Labour Organization. <a href="https://doi.org/10.54394/00033147" target="_blank" rel="noopener">https://doi.org/10.54394/00033147</a></li>
+<li>Government of Kazakhstan. (n.d.). <em>Pensionnyi vozrast</em> [Retirement age]. eGov. <a href="https://www.gov.kz/situations/5/25?lang=ru" target="_blank" rel="noopener">https://www.gov.kz/situations/5/25?lang=ru</a></li>
+<li>Inbusiness.kz. (2026, June 8). <em>Iskusstvennyi intellekt izmenit 41% rabochikh mest v Kazakhstane k 2035 godu</em> [AI will change 41% of jobs in Kazakhstan by 2035]. <a href="https://www.inbusiness.kz/ru/last/iskusstvennyj-intellekt-izmenit-41-rabochih-mest-v-kazahstane-k-2035-godu" target="_blank" rel="noopener">https://www.inbusiness.kz/ru/last/iskusstvennyj-intellekt-izmenit-41-rabochih-mest-v-kazahstane-k-2035-godu</a></li>
+<li>Kazhenova, A. (2026, July 18). Iz-za iskusstvennogo intellekta v Kazakhstane nachalis&#x27; pervye sokrashcheniya [First layoffs due to AI have begun in Kazakhstan]. <em>Finratings.kz</em>. <a href="https://finratings.kz/news/15529-iz-za-iskusstvennogo-intellekta-v-kazakhstane-nachalis-pervye-sokrashcheniia/" target="_blank" rel="noopener">https://finratings.kz/news/15529-iz-za-iskusstvennogo-intellekta-v-kazakhstane-nachalis-pervye-sokrashcheniia/</a></li>
+<li>Koster, S., &amp; Brunori, C. (2021). What to do when the robots come? Non-formal education in jobs affected by automation. <em>International Journal of Manpower, 42</em>(8), 1397–1419. <a href="https://doi.org/10.1108/IJM-06-2020-0314" target="_blank" rel="noopener">https://doi.org/10.1108/IJM-06-2020-0314</a></li>
+<li>Law of the Republic of Kazakhstan No. 230-VIII &quot;On Artificial Intelligence&quot;. (2025, November 17). <a href="https://adilet.zan.kz/rus/docs/Z2500000230" target="_blank" rel="noopener">https://adilet.zan.kz/rus/docs/Z2500000230</a></li>
+<li>Le Barbanchon, T., Hensvik, L., &amp; Rathelot, R. (2023). <em>How can AI improve search and matching? Evidence from 59 million personalized job recommendations</em> [Working paper]. <a href="https://conference.iza.org/EVAL_2023/rathelot_r3660.pdf" target="_blank" rel="noopener">https://conference.iza.org/EVAL_2023/rathelot_r3660.pdf</a></li>
+<li>Leinuste, K. (2021, October). <em>Decision support tool &quot;OTT&quot; for employment counsellors in the Estonian PES</em>[Presentation, Estonian Unemployment Insurance Fund]. OECD. <a href="https://www.oecd.org/els/emp/PES-Digital-Oct2021-Estonia.pdf" target="_blank" rel="noopener">https://www.oecd.org/els/emp/PES-Digital-Oct2021-Estonia.pdf</a></li>
+<li>Li, P., Yang, J., Islam, M. A., &amp; Ren, S. (2025). Making AI less &quot;thirsty&quot;: Uncovering and addressing the secret water footprint of AI models. <em>Communications of the ACM</em>. <a href="https://doi.org/10.1145/3724499" target="_blank" rel="noopener">https://doi.org/10.1145/3724499</a></li>
+<li>Luccioni, S., Jernite, Y., &amp; Strubell, E. (2024). Power hungry processing: Watts driving the cost of AI deployment? In <em>Proceedings of the 2024 ACM Conference on Fairness, Accountability, and Transparency</em> (pp. 85–99). ACM. <a href="https://doi.org/10.1145/3630106.3658542" target="_blank" rel="noopener">https://doi.org/10.1145/3630106.3658542</a></li>
+<li>Niklas, J. (2019, April 16). Poland: Government to scrap controversial unemployment scoring system. <em>AlgorithmWatch</em>. <a href="https://algorithmwatch.org/en/poland-government-to-scrap-controversial-unemployment-scoring-system/" target="_blank" rel="noopener">https://algorithmwatch.org/en/poland-government-to-scrap-controversial-unemployment-scoring-system/</a></li>
+<li>OECD. (2017). Working longer with age: Strengthening the labour market outcomes of older workers in Kazakhstan. In <em>Building inclusive labour markets in Kazakhstan: A focus on youth, older workers and people with disabilities</em>. OECD Publishing. <a href="https://doi.org/10.1787/9789264273023-7-en" target="_blank" rel="noopener">https://doi.org/10.1787/9789264273023-7-en</a></li>
+<li>OECD. (2019). <em>Skills matter: Additional results from the Survey of Adult Skills</em>. OECD Publishing. <a href="https://doi.org/10.1787/1f029d8f-en" target="_blank" rel="noopener">https://doi.org/10.1787/1f029d8f-en</a></li>
+<li>OECD.AI. (2026). <em>OTT2: Dynamic data-driven personalisation of employment services and counsellor decision support</em>[Policy initiative]. <a href="https://oecd.ai/en/dashboards/policy-initiatives/ott2-dynamic-data-driven-personalisation-of-employment-services-and-counsellor-decision-support" target="_blank" rel="noopener">https://oecd.ai/en/dashboards/policy-initiatives/ott2-dynamic-data-driven-personalisation-of-employment-services-and-counsellor-decision-support</a></li>
+<li>Rakhimova, A. (2026, October 23). Kak naiti rabotu pered pensiei v Kazakhstane [How to find work before retirement in Kazakhstan]. <em>DigitalBusiness.kz</em>. <a href="https://digitalbusiness.kz/2026-10-23/posle-50-let-v-kazahstane-mozhno-nayti-rabotu-cherez-gosprogrammu-kak-popast-i-skolko-platyat/" target="_blank" rel="noopener">https://digitalbusiness.kz/2026-10-23/posle-50-let-v-kazahstane-mozhno-nayti-rabotu-cherez-gosprogrammu-kak-popast-i-skolko-platyat/</a></li>
+<li>Samruk-Energy. (2025). <em>Annual report 2024: Kazakhstan power and coal markets</em>. <a href="https://ar2024.samruk-energy.kz/en/kazakhstan-power-and-coal-markets.html" target="_blank" rel="noopener">https://ar2024.samruk-energy.kz/en/kazakhstan-power-and-coal-markets.html</a></li>
+<li>Togyzbayeva, A. (2025). <em>Kazakhstan: Active labour market measures for youth</em> [Country analysis]. European Training Foundation. <a href="https://www.etf.europa.eu/sites/default/files/2026-07/Country%20Analysis%20ALMP_Kazakhstan_Final_EN_0.pdf" target="_blank" rel="noopener">https://www.etf.europa.eu/sites/default/files/2026-07/Country%20Analysis%20ALMP_Kazakhstan_Final_EN_0.pdf</a></li>
+<li>Tubaro, P., Casilli, A. A., &amp; Coville, M. (2020). The trainer, the verifier, the imitator: Three ways in which human platform workers support artificial intelligence. <em>Big Data &amp; Society, 7</em>(1). <a href="https://doi.org/10.1177/2053951720919776" target="_blank" rel="noopener">https://doi.org/10.1177/2053951720919776</a></li>
+<li>Williams, A., &amp; Miceli, M. (2023, September 6). Data work and its layers of (in)visibility. <em>Just Tech, Social Science Research Council</em>. <a href="https://doi.org/10.35650/JT.3060.d.2023" target="_blank" rel="noopener">https://doi.org/10.35650/JT.3060.d.2023</a></li>
+<li>World Bank. (2025, November 21). <em>Strengthening AI foundations: Emerging opportunities for developing countries</em>[Factsheet on the Digital Progress and Trends Report 2025]. <a href="https://www.worldbank.org/en/news/factsheet/2025/11/21/strengthening-ai-foundations-emerging-opportunities-for-developing-countries" target="_blank" rel="noopener">https://www.worldbank.org/en/news/factsheet/2025/11/21/strengthening-ai-foundations-emerging-opportunities-for-developing-countries</a></li>
+    </ul>
+  </div>
+</section>
+
+</main>
+<footer>PLS 419 · Final project</footer>
+<button class="to-top" id="totop" aria-label="Back to top">↑</button>
+
+<script>
+(function(){
+  // Kazakhtelecom dots
+  var dots=document.getElementById('dots');
+  for(var i=0;i<80;i++){var d=document.createElement('i');if(i>=30)d.className='cut';dots.appendChild(d);}
+
+  // Figure 1 chart, read straight from the table so the numbers are identical
+  var rows=[].slice.call(document.querySelectorAll('table.census tbody tr')).filter(function(r){return !r.classList.contains('total')});
+  var data=rows.map(function(r){var c=r.children;return{age:c[0].textContent,a:+c[1].textContent.replace(/,/g,''),b:+c[2].textContent.replace(/,/g,''),chg:c[3].textContent,older:r.classList.contains('older')}});
+  var max=Math.max.apply(null,data.map(function(d){return Math.max(d.a,d.b)}));
+  var chart=document.getElementById('chart1');
+  data.forEach(function(d){
+    var row=document.createElement('div');row.className='chart-row'+(d.older?' older':'');
+    row.title=d.age+': '+d.a.toLocaleString('en')+' → '+d.b.toLocaleString('en');
+    row.innerHTML='<span class="age">'+d.age+'</span><div class="bars"><div class="bar b09" data-w="'+(d.a/max*100)+'"></div><div class="bar b21" data-w="'+(d.b/max*100)+'"></div></div><span class="chg">'+d.chg+'</span>';
+    chart.appendChild(row);
+  });
+
+  function activate(el){
+    if(el.id==='dots'||el.classList.contains('marker')||el.id==='todo')el.classList.add('on');
+    el.querySelectorAll&&el.querySelectorAll('.bar,.exp-fill').forEach(function(b){b.style.width=b.dataset.w?b.dataset.w+'%':(b.dataset.v*100)+'%'});
+    el.classList.add('on');
+  }
+  var targets=document.querySelectorAll('.reveal,.marker,#dots,#todo,#chart1,#exposure,#stamp');
+  if('IntersectionObserver' in window){
+    var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){activate(e.target);io.unobserve(e.target)}})},{threshold:.25});
+    targets.forEach(function(t){io.observe(t)});
+  } else targets.forEach(activate);
+
+  // active section in the route + progress bar
+  var links=document.querySelectorAll('#route a');
+  var secs=[].map.call(links,function(a){return document.querySelector(a.getAttribute('href'))});
+  var last=-2,prog=document.getElementById('progress'),top=document.getElementById('totop');
+  function onScroll(){
+    var y=window.scrollY,h=document.documentElement.scrollHeight-innerHeight;
+    prog.style.width=(h>0?y/h*100:0)+'%';
+    top.classList.toggle('show',y>800);
+    var cur=-1;secs.forEach(function(s,i){if(s.getBoundingClientRect().top<innerHeight*.35)cur=i});if(cur===last)return;last=cur;
+    links.forEach(function(a,i){a.classList.toggle('active',i===cur)});
+    if(cur>=0){var r=document.getElementById("route"),a=links[cur];r.scrollLeft=a.offsetLeft-r.clientWidth/2+a.offsetWidth/2}
+  }
+  addEventListener('scroll',onScroll,{passive:true});onScroll();
+  top.onclick=function(){scrollTo({top:0,behavior:'smooth'})};
+
+  // reference filter
+  var items=document.querySelectorAll('#refs li');
+  document.getElementById('refsearch').addEventListener('input',function(){
+    var q=this.value.toLowerCase();
+    items.forEach(function(li){li.style.display=li.textContent.toLowerCase().indexOf(q)>-1?'':'none'});
+  });
+})();
+</script>
+</body>
+</html>
